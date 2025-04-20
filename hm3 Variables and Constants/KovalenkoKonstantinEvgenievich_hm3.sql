@@ -16,7 +16,7 @@ declare
    c_reset_status     constant number := 2;
    v_reset_reason     varchar2(250) := 'недостаточно средств'; 
 begin 
-dbms_output.put_line(v_message ||' Статус: '|| c_status_reset ||'. Причина: '|| v_reset_reason);
+dbms_output.put_line(v_message ||' Статус: '|| c_reset_status ||'. Причина: '|| v_reset_reason);
 end;
 /
 -- Отмена платежа --
@@ -25,7 +25,7 @@ declare
    c_cancel_status    constant number := 3;
    v_cancel_reason    varchar2(250) := 'ошибка пользователя';
 begin 
-dbms_output.put_line(v_message ||' Статус: '|| c_status_cancel ||'. Причина: '|| v_cancel_reason);
+dbms_output.put_line(v_message ||' Статус: '|| c_cancel_status ||'. Причина: '|| v_cancel_reason);
 end;
 / 
 -- Завершение платежа --
@@ -33,7 +33,7 @@ declare
    v_message         varchar2(500) := 'Успешное завершение платежа';
    c_complet_status  constant number := 1;
 begin 
-dbms_output.put_line(v_message ||'. Статус: '|| c_status_complet);
+dbms_output.put_line(v_message ||'. Статус: '|| c_complet_status);
 end;
 /
 -- Данные платежа --
