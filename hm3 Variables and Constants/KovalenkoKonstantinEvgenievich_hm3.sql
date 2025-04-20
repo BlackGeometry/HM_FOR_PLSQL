@@ -5,33 +5,33 @@
 -- Создание платежа --
 declare 
    v_message        varchar2(500) := 'Платеж создан';
-   c_status_pay_cr  constant number := 0;
+   c_pay_cr_status  constant number := 0;
 begin 
 dbms_output.put_line(v_message ||'. Статус: '|| c_status_pay_cr);
 end;
 /
 -- Сброс платежа --
 declare 
-   v_message               varchar2(500) := 'Сброс платежа в "ошибочный статус" с указанием причины.';
-   c_status_reset  		   constant number := 2;
-   v_reason_reset_insuffi  varchar2(250) := 'недостаточно средств'; 
+   v_message          varchar2(500) := 'Сброс платежа в "ошибочный статус" с указанием причины.';
+   c_reset_status     constant number := 2;
+   v_reset_reason     varchar2(250) := 'недостаточно средств'; 
 begin 
-dbms_output.put_line(v_message ||' Статус: '|| c_status_reset ||'. Причина: '|| v_reason_reset_insuffi);
+dbms_output.put_line(v_message ||' Статус: '|| c_status_reset ||'. Причина: '|| v_reset_reason);
 end;
 /
 -- Отмена платежа --
 declare 
-   v_message             varchar2(500) := 'Отмена платежа с указанием причины.';
-   c_status_cancel       constant number := 3;
-   v_reason_cancel_miss  varchar2(250) := 'ошибка пользователя';
+   v_message          varchar2(500) := 'Отмена платежа с указанием причины.';
+   c_cancel_status    constant number := 3;
+   v_cancel_reason    varchar2(250) := 'ошибка пользователя';
 begin 
-dbms_output.put_line(v_message ||' Статус: '|| c_status_cancel ||'. Причина: '|| v_reason_cancel_miss);
+dbms_output.put_line(v_message ||' Статус: '|| c_status_cancel ||'. Причина: '|| v_cancel_reason);
 end;
 / 
 -- Завершение платежа --
 declare 
    v_message         varchar2(500) := 'Успешное завершение платежа';
-   c_status_complet  constant number := 1;
+   c_complet_status  constant number := 1;
 begin 
 dbms_output.put_line(v_message ||'. Статус: '|| c_status_complet);
 end;
