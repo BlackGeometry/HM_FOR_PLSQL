@@ -7,7 +7,7 @@ declare
    v_message        varchar2(500) := 'Платеж создан';
    c_pay_cr_status  constant number := 0;
 begin 
-dbms_output.put_line(v_message ||'. Статус: '|| c_status_pay_cr);
+dbms_output.put_line(v_message ||'. Статус: '|| c_pay_cr_status);
 end;
 /
 -- Сброс платежа --
