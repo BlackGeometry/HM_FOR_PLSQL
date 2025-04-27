@@ -6,7 +6,8 @@
 declare 
    v_message         varchar2(500) := 'Платеж создан';
    c_pay_cr_status   constant number(10) := 0;
-   v_pay_cr_date     timestamp := TO_TIMESTAMP('01.01.2500 00:00:00', 'DD.MM.YYYY HH24:MI:SS', 'NLS_DATE_LANGUAGE=RUSSIAN'); 
+   v_pay_cr_date     timestamp := systimestamp; 
+   v_payment_id      number(38);
 begin 
 dbms_output.put_line(v_message ||'. Статус: '|| c_pay_cr_status);
 dbms_output.put_line(to_char(v_pay_cr_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
@@ -17,7 +18,7 @@ declare
    v_message          varchar2(500 char) := 'Сброс платежа в "ошибочный статус" с указанием причины.';
    c_reset_status     constant number(10) := 2;
    v_reset_reason     varchar2(200 char) := 'недостаточно средств';
-   v_reset_date       timestamp := TO_TIMESTAMP('01.01.2500 00:00:00', 'DD.MM.YYYY HH24:MI:SS', 'NLS_DATE_LANGUAGE=RUSSIAN');  
+   v_reset_date       timestamp := systimestamp;  
 begin 
 dbms_output.put_line(v_message ||' Статус: '|| c_reset_status ||'. Причина: '|| v_reset_reason);
 dbms_output.put_line(to_char(v_reset_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
@@ -28,7 +29,7 @@ declare
    v_message          varchar2(500 char) := 'Отмена платежа с указанием причины.';
    c_cancel_status    constant number(10) := 3;
    v_cancel_reason    varchar2(200 char) := 'ошибка пользователя';
-   v_cancel_date      timestamp := TO_TIMESTAMP('01.01.2500 00:00:00', 'DD.MM.YYYY HH24:MI:SS', 'NLS_DATE_LANGUAGE=RUSSIAN');  
+   v_cancel_date      timestamp := systimestamp;   
 begin 
 dbms_output.put_line(v_message ||' Статус: '|| c_cancel_status ||'. Причина: '|| v_cancel_reason);
 dbms_output.put_line(to_char(v_cancel_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
