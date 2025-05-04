@@ -4,10 +4,10 @@
 */
 -- Создание платежа --
 declare 
-   v_message         varchar2(500) := 'Платеж создан';
-   c_pay_cr_status   constant number(10) := 0;
+   v_message         varchar2(500 char) := 'Платеж создан';
+   c_pay_cr_status   constant PAYMENT.STATUS%type := 0;
    v_pay_cr_date     timestamp := systimestamp; 
-   v_payment_id      number(38) := 0;
+   v_payment_id      PAYMENT.PAYMENT_ID%type := 0;
 begin 
 
 dbms_output.put_line(v_message ||'. Статус: '|| c_pay_cr_status || '. ID: '|| v_payment_id);
@@ -18,10 +18,10 @@ end;
 -- Сброс платежа --
 declare 
    v_message         varchar2(500 char) := 'Сброс платежа в "ошибочный статус" с указанием причины.';
-   c_reset_status    constant number(10) := 2;
-   v_reset_reason    varchar2(200 char) := 'недостаточно средств';
+   c_reset_status    constant PAYMENT.STATUS%type := 2;
+   v_reset_reason    PAYMENT.STATUS_CHANGE_REASON%type := 'недостаточно средств'; 
    v_reset_date      timestamp := systimestamp;  
-   v_payment_id      number(38) := 0;
+   v_payment_id      PAYMENT.PAYMENT_ID%type := 0;
 
 begin 
 
@@ -41,10 +41,10 @@ end;
 -- Отмена платежа --
 declare 
    v_message         varchar2(500 char) := 'Отмена платежа с указанием причины.';
-   c_cancel_status   constant number(10) := 3;
-   v_cancel_reason   varchar2(200 char) := 'ошибка пользователя';
+   c_cancel_status   constant PAYMENT.STATUS%type := 3;
+   v_cancel_reason   PAYMENT.STATUS_CHANGE_REASON%type := 'ошибка пользователя';
    v_cancel_date     timestamp := systimestamp;  
-   v_payment_id      number(38) := 0;
+   v_payment_id      PAYMENT.PAYMENT_ID%type := 0;
  
 begin 
   
@@ -64,9 +64,9 @@ end;
 -- Завершение платежа --
 declare 
    v_message         varchar2(500 char) := 'Успешное завершение платежа';
-   c_complet_status  constant number(10) := 1;
+   c_complet_status  constant PAYMENT.STATUS%type := 1;
    v_complet_date    timestamp := sysdate;  
-   v_payment_id      number(38) := 0;
+   v_payment_id      PAYMENT.PAYMENT_ID%type := 0;
 
 begin 
   
@@ -83,7 +83,7 @@ end;
 declare 
    v_message        varchar2(500 char) := 'Данные платежа добавлены или обновлены по списку id_поля/значение';
    v_pay_data_date  timestamp := TO_TIMESTAMP('01.01.2500 00:00:00', 'DD.MM.YYYY HH24:MI:SS', 'NLS_DATE_LANGUAGE=RUSSIAN'); 
-   v_payment_id     number(38) := 0;
+   v_payment_id     PAYMENT.PAYMENT_ID%type := 0;
  
 begin  
   
@@ -102,7 +102,7 @@ declare
    v_pay_info_time   date := sysdate;
    v_pay_info_month  varchar2(50);  
    v_pay_info_year   varchar2(50);
-   v_payment_id      number(38) := 0;
+   v_payment_id      PAYMENT.PAYMENT_ID%type := 0;
 
 begin 
     

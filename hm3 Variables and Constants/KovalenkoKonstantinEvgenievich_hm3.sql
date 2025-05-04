@@ -4,49 +4,49 @@
 */
 -- Создание платежа --
 declare 
-   v_message   varchar2(50) := 'Платеж создан';
-   c_status    constant number := 0;
+   v_message        varchar2(500) := 'Платеж создан';
+   c_pay_cr_status  constant number := 0;
 begin 
-dbms_output.put_line(v_message ||'. Статус: '|| c_status);
+dbms_output.put_line(v_message ||'. Статус: '|| c_pay_cr_status);
 end;
 /
 -- Сброс платежа --
 declare 
-   v_message   varchar2(50) := 'Сброс платежа';
-   c_status    constant number := 2;
-   v_reason    varchar2(50) := 'недостаточно средств'; 
+   v_message          varchar2(500) := 'Сброс платежа в "ошибочный статус" с указанием причины.';
+   c_reset_status     constant number := 2;
+   v_reset_reason     varchar2(250) := 'недостаточно средств'; 
 begin 
-dbms_output.put_line(v_message ||' в "ошибочный статус" с указанием причины. Статус: '|| c_status ||'. Причина: '|| v_reason);
+dbms_output.put_line(v_message ||' Статус: '|| c_reset_status ||'. Причина: '|| v_reset_reason);
 end;
 /
 -- Отмена платежа --
 declare 
-   v_message   varchar2(50) := 'Отмена платежа';
-   c_status    constant number := 3;
-   v_reason    varchar2(50) := 'ошибка пользователя';
+   v_message          varchar2(500) := 'Отмена платежа с указанием причины.';
+   c_cancel_status    constant number := 3;
+   v_cancel_reason    varchar2(250) := 'ошибка пользователя';
 begin 
-dbms_output.put_line(v_message ||' с указанием причины. Статус: '|| c_status ||'. Причина: '|| v_reason);
+dbms_output.put_line(v_message ||' Статус: '|| c_cancel_status ||'. Причина: '|| v_cancel_reason);
 end;
-/
+/ 
 -- Завершение платежа --
 declare 
-   v_message   varchar2(100) := 'Успешное завершение платежа';
-   c_status    constant number := 1;
+   v_message         varchar2(500) := 'Успешное завершение платежа';
+   c_complet_status  constant number := 1;
 begin 
-dbms_output.put_line(v_message ||'. Статус: '|| c_status);
+dbms_output.put_line(v_message ||'. Статус: '|| c_complet_status);
 end;
 /
 -- Данные платежа --
 declare 
-   v_message   varchar2(200) := 'добавлены или обновлены по списку id_поля/значение';
+   v_message  varchar2(500) := 'Данные платежа добавлены или обновлены по списку id_поля/значение';
 begin  
-dbms_output.put_line('Данные платежа '|| v_message);
+dbms_output.put_line(v_message);
 end;
 /
 -- Детали платежа --
 declare 
-   v_message   varchar2(200) := 'удалены по списку id_полей';
+   v_message varchar2(500) := 'Детали платежа удалены по списку id_полей';
 begin  
-dbms_output.put_line('Детали платежа '|| v_message);
+dbms_output.put_line(v_message);
 end;
 /
