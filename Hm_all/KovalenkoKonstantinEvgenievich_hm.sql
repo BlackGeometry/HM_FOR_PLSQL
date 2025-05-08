@@ -8,8 +8,13 @@ declare
    c_pay_cr_status   constant PAYMENT.STATUS%type := 0;
    v_pay_cr_date     timestamp := systimestamp; 
    v_payment_id      PAYMENT.PAYMENT_ID%type := 0;
+   v_pay_ct_data     t_payment_detail_array := t_payment_detail_array(
+                                                                      t_payment_detail(1, 'SBER'),
+                                                                      t_payment_detail(2, '192.168.100.10'),
+                                                                      t_payment_detail(3, 'Шаблон'),
+                                                                      t_payment_detail(4, 'Да')
+                                                                      );
 begin 
-
 dbms_output.put_line(v_message ||'. Статус: '|| c_pay_cr_status || '. ID: '|| v_payment_id);
 dbms_output.put_line(to_char(v_pay_cr_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
 end;
@@ -84,7 +89,9 @@ declare
    v_message        varchar2(500 char) := 'Данные платежа добавлены или обновлены по списку id_поля/значение';
    v_pay_data_date  timestamp := TO_TIMESTAMP('01.01.2500 00:00:00', 'DD.MM.YYYY HH24:MI:SS', 'NLS_DATE_LANGUAGE=RUSSIAN'); 
    v_payment_id     PAYMENT.PAYMENT_ID%type := 0;
- 
+   v_pay_data_data  t_payment_detail_array := t_payment_detail_array(            
+                                                                     t_payment_detail(3, 'Обновлено!')
+                                                                     );
 begin  
   
  if v_payment_id is null then 
@@ -103,6 +110,7 @@ declare
    v_pay_info_month  varchar2(50);  
    v_pay_info_year   varchar2(50);
    v_payment_id      PAYMENT.PAYMENT_ID%type := 0;
+   v_pay_info_data   t_number_array := t_number_array(1,2,3);
 
 begin 
     
