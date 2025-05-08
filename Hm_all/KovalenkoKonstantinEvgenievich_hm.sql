@@ -15,6 +15,25 @@ declare
                                                                       t_payment_detail(4, 'Да')
                                                                       );
 begin 
+  
+  if v_pay_ct_data is not empty then
+    
+     for i in v_pay_ct_data.first..v_pay_ct_data.last loop
+       
+       if v_pay_ct_data(i).field_id is null then
+          dbms_output.put_line('ID Поля не может быть пустым!');
+       end if;
+          
+       if v_pay_ct_data(i).field_value is null then
+          dbms_output.put_line('Значение в поле не может быть пустым!');   
+       end if;
+    
+       dbms_output.put_line('Field_id: '||v_pay_ct_data(i).field_id ||'. Field_value: '|| v_pay_ct_data(i).field_value);
+     end loop;  
+  else 
+    dbms_output.put_line('Коллекция не содержит данных!');
+  end if;  
+    
 dbms_output.put_line(v_message ||'. Статус: '|| c_pay_cr_status || '. ID: '|| v_payment_id);
 dbms_output.put_line(to_char(v_pay_cr_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
 end;
@@ -94,6 +113,24 @@ declare
                                                                      );
 begin  
   
+  if v_pay_data_data is not empty then
+    
+     for i in v_pay_data_data.first..v_pay_data_data.last loop
+       
+       if v_pay_data_data(i).field_id is null then
+          dbms_output.put_line('ID Поля не может быть пустым!');
+       end if;
+          
+       if v_pay_data_data(i).field_value is null then
+          dbms_output.put_line('Значение в поле не может быть пустым!');   
+       end if;
+    
+       dbms_output.put_line('Field_id: '||v_pay_data_data(i).field_id ||'. Field_value: '|| v_pay_data_data(i).field_value);
+     end loop;  
+  else 
+    dbms_output.put_line('Коллекция не содержит данных!');
+  end if;  
+
  if v_payment_id is null then 
     dbms_output.put_line('ID объекта не может быть пустым!');
  end if;
@@ -123,6 +160,7 @@ begin
    
 dbms_output.put_line(v_message);
 dbms_output.put_line('Месяц платежа '|| v_pay_info_month ||', год платежа '|| v_pay_info_year || '. ID: '|| v_payment_id);
+dbms_output.put_line('Количество полей для удаления: '|| v_pay_info_data.count());
 
 end;
 /
