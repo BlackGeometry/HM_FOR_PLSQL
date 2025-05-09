@@ -2,18 +2,27 @@
 Автор: ФИО
 Описание скрипта: API для сущностей “Платеж” и “Детали платежа”
 */
+
+-- В схеме @plsql14_student11 не было ни одной таблицы(потом пришлось заполнять скриптами) для правки данных(соответсвенно и партиций), seq тоже не было. --
+-- Просьба поправить если нужны будут другие объекты в будущем. --
+
 -- Создание платежа --
 declare 
    v_message         varchar2(500 char) := 'Платеж создан';
    c_pay_cr_status   constant PAYMENT.STATUS%type := 0;
    v_pay_cr_date     timestamp := systimestamp; 
    v_payment_id      PAYMENT.PAYMENT_ID%type := 0;
+   v_pay_cr_sum      PAYMENT.SUMMA%type := 0.001;
+   v_pay_cr_cur_id   PAYMENT.CURRENCY_ID%type := 643;
+   v_pay_cr_from_id  PAYMENT.FROM_CLIENT_ID%type := 1;
+   v_pay_cr_to_id    PAYMENT.TO_CLIENT_ID%type := 2;
    v_pay_ct_data     t_payment_detail_array := t_payment_detail_array(
                                                                       t_payment_detail(1, 'SBER'),
                                                                       t_payment_detail(2, '192.168.100.10'),
                                                                       t_payment_detail(3, 'Шаблон'),
                                                                       t_payment_detail(4, 'Да')
                                                                       );
+                                                                 
 begin 
   
   if v_pay_ct_data is not empty then
@@ -33,7 +42,36 @@ begin
   else 
     dbms_output.put_line('Коллекция не содержит данных!');
   end if;  
-    
+
+   --Заполнение payment--
+  insert into payment(PAYMENT_ID, 
+                      CREATE_DTIME, 
+                      SUMMA,
+                      CURRENCY_ID, 
+                      FROM_CLIENT_ID, 
+                      TO_CLIENT_ID)
+  values (payment_seq.nextval, 
+          systimestamp, 
+          v_pay_cr_sum, 
+          v_pay_cr_cur_id,
+          v_pay_cr_from_id, 
+          v_pay_cr_to_id) 
+  returning payment_id 
+  into v_payment_id;
+  commit;
+
+  --Заполнение payment_detail--
+  insert into payment_detail(PAYMENT_ID, 
+                             PAYMENT_CREATE_DTIME, 
+                             FIELD_ID, 
+                             FIELD_VALUE)
+  select v_payment_id, 
+         systimestamp, 
+         value(t).FIELD_ID, 
+         value(t).field_value 
+  from table(v_pay_ct_data)t; 
+  commit;
+  
 dbms_output.put_line(v_message ||'. Статус: '|| c_pay_cr_status || '. ID: '|| v_payment_id);
 dbms_output.put_line(to_char(v_pay_cr_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
 end;
@@ -47,6 +85,7 @@ declare
    v_reset_date      timestamp := systimestamp;  
    v_payment_id      PAYMENT.PAYMENT_ID%type := 0;
 
+
 begin 
 
  if v_reset_reason is null then 
@@ -56,6 +95,13 @@ begin
  if v_payment_id is null then 
     dbms_output.put_line('ID объекта не может быть пустым!');
  end if; 
+ 
+ update payment
+ set status = c_reset_status,
+     status_change_reason = v_reset_reason
+ where payment_id = v_payment_id 
+       and 
+       status = 0; 
 
 dbms_output.put_line(v_message ||' Статус: '|| c_reset_status ||'. Причина: '|| v_reset_reason || '. ID: '|| v_payment_id);
 dbms_output.put_line(to_char(v_reset_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
@@ -79,6 +125,13 @@ begin
  if v_payment_id is null then 
     dbms_output.put_line('ID объекта не может быть пустым!');
  end if; 
+ 
+ update payment
+ set status = c_cancel_status,
+     status_change_reason = v_cancel_reason
+ where payment_id = v_payment_id 
+       and 
+       status = 0; 
 
 dbms_output.put_line(v_message ||' Статус: '|| c_cancel_status ||'. Причина: '|| v_cancel_reason || '. ID: '|| v_payment_id);
 dbms_output.put_line(to_char(v_cancel_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
@@ -97,6 +150,13 @@ begin
  if v_payment_id is null then 
     dbms_output.put_line('ID объекта не может быть пустым!');
  end if;
+ 
+ update payment
+ set status = c_complet_status,
+     status_change_reason = null
+ where payment_id = v_payment_id 
+       and 
+       status = 0;
 
 dbms_output.put_line(v_message ||'. Статус: '|| c_complet_status || '. ID: '|| v_payment_id);
 dbms_output.put_line(to_char(v_complet_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
@@ -134,6 +194,27 @@ begin
  if v_payment_id is null then 
     dbms_output.put_line('ID объекта не может быть пустым!');
  end if;
+ 
+ merge into payment_detail pd
+ using (select v_payment_id as payment_id,
+               systimestamp as payment_create_dtime, 
+               value(t).field_id as field_id,
+               value(t).field_value as field_value
+        from table (v_pay_data_data) t) arr 
+ on (pd.payment_id = arr.payment_id
+     and 
+     pd.field_id = arr.field_id)
+ when matched then
+    update set pd.field_value = arr.field_value
+ when not matched then
+    insert (pd.payment_id,
+            pd.payment_create_dtime,
+            pd.field_id,
+            pd.field_value)
+    values  (arr.payment_id,
+             arr.payment_create_dtime,
+             arr.field_id,
+             arr.field_value);
 
 dbms_output.put_line(v_message || '. ID: '|| v_payment_id);
 dbms_output.put_line(to_char(v_pay_data_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
@@ -160,6 +241,18 @@ begin
    
 dbms_output.put_line(v_message);
 dbms_output.put_line('Месяц платежа '|| v_pay_info_month ||', год платежа '|| v_pay_info_year || '. ID: '|| v_payment_id);
+
+
+ if v_pay_info_data is empty then
+     dbms_output.put_line('Коллекция не содержит данных!');
+ end if;  
+ 
+ delete from payment_detail pd
+ where pd.payment_id = v_payment_id
+       and 
+       pd.field_id in (select value(t) as field_id
+                       from table(v_pay_info_data) t );
+
 dbms_output.put_line('Количество полей для удаления: '|| v_pay_info_data.count());
 
 end;
