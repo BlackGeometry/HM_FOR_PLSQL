@@ -1,6 +1,6 @@
 create or replace package body payment_detail_api_pack is
   /*
-  Автор: ФИО
+  Автор: Kovalenko K.E.
   Описание скрипта: API для сущностей “Детали платежа”
   */
 
@@ -19,21 +19,21 @@ create or replace package body payment_detail_api_pack is
        for i in p_pay_data_data.first..p_pay_data_data.last loop
          
          if p_pay_data_data(i).field_id is null then
-            dbms_output.put_line(c_error_msg_empty_id);
+            raise_application_error(c_error_code_empty_par, c_error_msg_empty_id);
          end if;
             
          if p_pay_data_data(i).field_value is null then
-            dbms_output.put_line(c_error_msg_empty_val);   
+            raise_application_error(c_error_code_empty_par, c_error_msg_empty_val);   
          end if;
       
          dbms_output.put_line('Field_id: '||p_pay_data_data(i).field_id ||'. Field_value: '|| p_pay_data_data(i).field_value);
        end loop;  
     else 
-      dbms_output.put_line(c_error_msg_empty_coll);
+      raise_application_error(c_error_code_empty_par, c_error_msg_empty_coll);
     end if;  
 
    if p_payment_id is null then 
-      dbms_output.put_line(c_error_msg_empty_obj_id);
+      raise_application_error(c_error_code_empty_par, c_error_msg_empty_obj_id);
    end if;
    
    merge into payment_detail pd
@@ -58,8 +58,8 @@ create or replace package body payment_detail_api_pack is
                arr.field_value);
 
   dbms_output.put_line(v_message || '. ID: '|| p_payment_id);
-  dbms_output.put_line(to_char(v_pay_data_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
-end;
+  dbms_output.put_line(to_char(v_pay_data_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN')); 
+end pr_insert_or_update_payment_detail;
 
   -- Детали платежа --
   procedure delete_payment_detail(p_payment_id     PAYMENT.PAYMENT_ID%type,
@@ -77,7 +77,7 @@ end;
      v_pay_info_year  := to_char(v_pay_info_time, 'YYYY');
      
    if p_payment_id is null then 
-      dbms_output.put_line(c_error_msg_empty_obj_id);
+      raise_application_error(c_error_code_empty_par, c_error_msg_empty_obj_id);
    end if;
      
   dbms_output.put_line(v_message);
@@ -85,7 +85,7 @@ end;
 
 
    if p_pay_info_data is empty then
-       dbms_output.put_line(c_error_msg_empty_coll);
+       raise_application_error(c_error_code_empty_par, c_error_msg_empty_coll);
    end if;  
    
    delete from payment_detail pd
@@ -95,7 +95,7 @@ end;
                          from table(p_pay_info_data) t );
 
   dbms_output.put_line('Количество полей для удаления: '|| p_pay_info_data.count());
-  end;
+  end delete_payment_detail;
   
-end;
+end payment_detail_api_pack;
 /

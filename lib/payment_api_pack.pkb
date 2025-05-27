@@ -1,6 +1,6 @@
 create or replace package body payment_api_pack is
 /*
-Автор: ФИО
+Автор: Kovalenko K.E.
 Описание скрипта: API для сущностей “Платеж”
 */
 
@@ -23,17 +23,17 @@ create or replace package body payment_api_pack is
        for i in p_pay_ct_data.first..p_pay_ct_data.last loop
          
          if p_pay_ct_data(i).field_id is null then
-            dbms_output.put_line(c_error_msg_empty_id);
+            raise_application_error(c_error_code_empty_par, c_error_msg_empty_id);
          end if;
             
          if p_pay_ct_data(i).field_value is null then
-            dbms_output.put_line(c_error_msg_empty_val);   
+            raise_application_error(c_error_code_empty_par, c_error_msg_empty_val);   
          end if;
       
          dbms_output.put_line('Field_id: '||p_pay_ct_data(i).field_id ||'. Field_value: '|| p_pay_ct_data(i).field_value);
        end loop;  
     else 
-      dbms_output.put_line(c_error_msg_empty_coll);
+      raise_application_error(c_error_code_empty_par, c_error_msg_empty_coll); 
     end if;  
 
      --Заполнение payment--
@@ -70,7 +70,7 @@ create or replace package body payment_api_pack is
 
        return v_payment_id;
 
-  end;
+  end f_create_payment;
 
   -- Сброс платежа -- 
   procedure pr_fail_payment(p_payment_id    PAYMENT.PAYMENT_ID%type,
@@ -83,11 +83,11 @@ create or replace package body payment_api_pack is
   begin 
 
    if p_reset_reason is null then 
-      dbms_output.put_line(c_error_msg_empty_reason);
+      raise_application_error(c_error_code_empty_par, c_error_msg_empty_reason);
    end if; 
    
    if p_payment_id is null then 
-      dbms_output.put_line(c_error_msg_empty_obj_id);
+      raise_application_error(c_error_code_empty_par, c_error_msg_empty_obj_id);
    end if; 
    
    update payment
@@ -99,7 +99,7 @@ create or replace package body payment_api_pack is
 
   dbms_output.put_line(v_message ||' Статус: '|| c_reset_status ||'. Причина: '|| p_reset_reason || '. ID: '|| p_payment_id);
   dbms_output.put_line(to_char(v_reset_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
-  end;
+  end pr_fail_payment;
 
   -- Отмена платежа --
   procedure pr_cancel_payment(p_payment_id     PAYMENT.PAYMENT_ID%type,
@@ -111,11 +111,11 @@ create or replace package body payment_api_pack is
   begin 
     
    if p_cancel_reason is null then 
-      dbms_output.put_line(c_error_msg_empty_reason);
+      raise_application_error(c_error_code_empty_par, c_error_msg_empty_reason);
    end if; 
 
    if p_payment_id is null then 
-      dbms_output.put_line(c_error_msg_empty_obj_id);
+      raise_application_error(c_error_code_empty_par, c_error_msg_empty_obj_id);
    end if; 
    
    update payment
@@ -127,7 +127,7 @@ create or replace package body payment_api_pack is
 
   dbms_output.put_line(v_message ||' Статус: '|| c_cancel_status ||'. Причина: '|| p_cancel_reason || '. ID: '|| p_payment_id);
   dbms_output.put_line(to_char(v_cancel_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
-  end;
+  end pr_cancel_payment;
 
   -- Завершение платежа --
   procedure pr_successful_finish_payment(p_payment_id PAYMENT.PAYMENT_ID%type)
@@ -137,7 +137,7 @@ create or replace package body payment_api_pack is
   begin 
     
    if p_payment_id is null then 
-      dbms_output.put_line(c_error_msg_empty_obj_id);
+      raise_application_error(c_error_code_empty_par, c_error_msg_empty_obj_id);
    end if;
    
    update payment
@@ -149,7 +149,7 @@ create or replace package body payment_api_pack is
 
   dbms_output.put_line(v_message ||'. Статус: '|| c_complet_status || '. ID: '|| p_payment_id);
   dbms_output.put_line(to_char(v_complet_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN'));
-  end;
-
-end;     
+  end pr_successful_finish_payment;
+  
+end payment_api_pack;     
 /
