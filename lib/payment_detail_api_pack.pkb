@@ -1,12 +1,26 @@
+
 create or replace package body payment_detail_api_pack is
   /*
   Автор: Kovalenko K.E.
   Описание скрипта: API для сущностей “Детали платежа”
   */
 
+  -- Признак выполнения API --
+  g_api_flag boolean := false;
+  
+  procedure api_chages_enable as
+    begin 
+      g_api_flag := true;
+    end;  
+  
+  procedure api_chages_disable as
+    begin 
+      g_api_flag := false;
+    end; 
+  
   -- Данные платежа --
   procedure pr_insert_or_update_payment_detail(p_payment_id     PAYMENT.PAYMENT_ID%type,
-                                               p_pay_data_data  t_payment_detail_array)
+                                               p_pay_data_arr   t_payment_detail_array)
   as 
      v_message        varchar2(500 char) := 'Данные платежа добавлены или обновлены по списку id_поля/значение';
      v_pay_data_date  timestamp := TO_TIMESTAMP('01.01.2500 00:00:00', 'DD.MM.YYYY HH24:MI:SS', 'NLS_DATE_LANGUAGE=RUSSIAN'); 
@@ -14,19 +28,19 @@ create or replace package body payment_detail_api_pack is
 
   begin  
     
-    if p_pay_data_data is not empty then
+    if p_pay_data_arr is not empty then
       
-       for i in p_pay_data_data.first..p_pay_data_data.last loop
+       for i in p_pay_data_arr.first..p_pay_data_arr.last loop
          
-         if p_pay_data_data(i).field_id is null then
+         if p_pay_data_arr(i).field_id is null then
             raise_application_error(c_error_code_empty_par, c_error_msg_empty_id);
          end if;
             
-         if p_pay_data_data(i).field_value is null then
+         if p_pay_data_arr(i).field_value is null then
             raise_application_error(c_error_code_empty_par, c_error_msg_empty_val);   
          end if;
       
-         dbms_output.put_line('Field_id: '||p_pay_data_data(i).field_id ||'. Field_value: '|| p_pay_data_data(i).field_value);
+         dbms_output.put_line('Field_id: '||p_pay_data_arr(i).field_id ||'. Field_value: '|| p_pay_data_arr(i).field_value);
        end loop;  
     else 
       raise_application_error(c_error_code_empty_par, c_error_msg_empty_coll);
@@ -36,12 +50,14 @@ create or replace package body payment_detail_api_pack is
       raise_application_error(c_error_code_empty_par, c_error_msg_empty_obj_id);
    end if;
    
+   api_chages_enable();
+   
    merge into payment_detail pd
    using (select p_payment_id as payment_id,
                  systimestamp as payment_create_dtime, 
                  value(t).field_id as field_id,
                  value(t).field_value as field_value
-          from table (p_pay_data_data) t) arr 
+          from table (p_pay_data_arr) t) arr 
    on (pd.payment_id = arr.payment_id
        and 
        pd.field_id = arr.field_id)
@@ -59,6 +75,14 @@ create or replace package body payment_detail_api_pack is
 
   dbms_output.put_line(v_message || '. ID: '|| p_payment_id);
   dbms_output.put_line(to_char(v_pay_data_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN')); 
+  
+   api_chages_disable();
+         
+   exception 
+      when others then 
+          api_chages_disable();
+      raise;
+  
 end pr_insert_or_update_payment_detail;
 
   -- Детали платежа --
@@ -88,6 +112,8 @@ end pr_insert_or_update_payment_detail;
        raise_application_error(c_error_code_empty_par, c_error_msg_empty_coll);
    end if;  
    
+   api_chages_enable();
+   
    delete from payment_detail pd
    where pd.payment_id = p_payment_id
          and 
@@ -95,7 +121,25 @@ end pr_insert_or_update_payment_detail;
                          from table(p_pay_info_data) t );
 
   dbms_output.put_line('Количество полей для удаления: '|| p_pay_info_data.count());
+  
+  api_chages_disable();
+         
+   exception 
+      when others then 
+          api_chages_disable();
+      raise;
+  
   end delete_payment_detail;
+  
+  -- Проверка DML через API --
+  procedure pr_dml_api_check
+  as    
+  begin 
+     if not g_api_flag then
+          raise_application_error(c_error_code_dml_changes, c_error_msg_dml_changes); 
+     end if;
+  end pr_dml_api_check;
+  
   
 end payment_detail_api_pack;
 /
