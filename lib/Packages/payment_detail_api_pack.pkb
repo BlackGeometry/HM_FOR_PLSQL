@@ -1,10 +1,9 @@
-
 create or replace package body payment_detail_api_pack is
   /*
   Автор: Kovalenko K.E.
   Описание скрипта: API для сущностей “Детали платежа”
   */
-
+  
   -- Признак выполнения API --
   g_api_flag boolean := false;
   
@@ -22,32 +21,10 @@ create or replace package body payment_detail_api_pack is
   procedure pr_insert_or_update_payment_detail(p_payment_id     PAYMENT.PAYMENT_ID%type,
                                                p_pay_data_arr   t_payment_detail_array)
   as 
-     v_message        varchar2(500 char) := 'Данные платежа добавлены или обновлены по списку id_поля/значение';
-     v_pay_data_date  timestamp := TO_TIMESTAMP('01.01.2500 00:00:00', 'DD.MM.YYYY HH24:MI:SS', 'NLS_DATE_LANGUAGE=RUSSIAN'); 
-     v_payment_id     PAYMENT.PAYMENT_ID%type := 0;
-
   begin  
-    
-    if p_pay_data_arr is not empty then
-      
-       for i in p_pay_data_arr.first..p_pay_data_arr.last loop
-         
-         if p_pay_data_arr(i).field_id is null then
-            raise_application_error(c_error_code_empty_par, c_error_msg_empty_id);
-         end if;
-            
-         if p_pay_data_arr(i).field_value is null then
-            raise_application_error(c_error_code_empty_par, c_error_msg_empty_val);   
-         end if;
-      
-         dbms_output.put_line('Field_id: '||p_pay_data_arr(i).field_id ||'. Field_value: '|| p_pay_data_arr(i).field_value);
-       end loop;  
-    else 
-      raise_application_error(c_error_code_empty_par, c_error_msg_empty_coll);
-    end if;  
 
    if p_payment_id is null then 
-      raise_application_error(c_error_code_empty_par, c_error_msg_empty_obj_id);
+      raise_application_error(payment_common_pack.c_error_code_empty_par, payment_common_pack.c_error_msg_empty_obj_id);
    end if;
    
    api_chages_enable();
@@ -72,9 +49,6 @@ create or replace package body payment_detail_api_pack is
                arr.payment_create_dtime,
                arr.field_id,
                arr.field_value);
-
-  dbms_output.put_line(v_message || '. ID: '|| p_payment_id);
-  dbms_output.put_line(to_char(v_pay_data_date, 'dd.mm.yyyy HH24:MI:SS.FF', 'NLS_DATE_LANGUAGE=RUSSIAN')); 
   
    api_chages_disable();
          
@@ -89,27 +63,14 @@ end pr_insert_or_update_payment_detail;
   procedure delete_payment_detail(p_payment_id     PAYMENT.PAYMENT_ID%type,
                                   p_pay_info_data  t_number_array)
   as 
-     v_message         varchar2(500 char) := 'Детали платежа удалены по списку id_полей';  
-     v_pay_info_time   date := sysdate;
-     v_pay_info_month  varchar2(50);  
-     v_pay_info_year   varchar2(50);
-     v_payment_id      PAYMENT.PAYMENT_ID%type := 0;
-
   begin 
-      
-     v_pay_info_month := to_char(v_pay_info_time, 'FMMonth DD');
-     v_pay_info_year  := to_char(v_pay_info_time, 'YYYY');
      
    if p_payment_id is null then 
-      raise_application_error(c_error_code_empty_par, c_error_msg_empty_obj_id);
+      raise_application_error(payment_common_pack.c_error_code_empty_par, payment_common_pack.c_error_msg_empty_obj_id);
    end if;
-     
-  dbms_output.put_line(v_message);
-  dbms_output.put_line('Месяц платежа '|| v_pay_info_month ||', год платежа '|| v_pay_info_year || '. ID: '|| p_payment_id);
-
 
    if p_pay_info_data is empty then
-       raise_application_error(c_error_code_empty_par, c_error_msg_empty_coll);
+       raise_application_error(payment_common_pack.c_error_code_empty_par, payment_common_pack.c_error_msg_empty_coll);
    end if;  
    
    api_chages_enable();
@@ -118,10 +79,7 @@ end pr_insert_or_update_payment_detail;
    where pd.payment_id = p_payment_id
          and 
          pd.field_id in (select value(t) as field_id
-                         from table(p_pay_info_data) t );
-
-  dbms_output.put_line('Количество полей для удаления: '|| p_pay_info_data.count());
-  
+                         from table(p_pay_info_data) t );  
   api_chages_disable();
          
    exception 
@@ -135,8 +93,8 @@ end pr_insert_or_update_payment_detail;
   procedure pr_dml_api_check
   as    
   begin 
-     if not g_api_flag then
-          raise_application_error(c_error_code_dml_changes, c_error_msg_dml_changes); 
+     if not g_api_flag and not payment_common_pack.f_dml_api_check() then
+          raise_application_error(payment_common_pack.c_error_code_dml_changes, payment_common_pack.c_error_msg_dml_changes); 
      end if;
   end pr_dml_api_check;
   

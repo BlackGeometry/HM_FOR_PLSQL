@@ -19,7 +19,7 @@ BEGIN
                                                       p_pay_cr_cur_id  =>  v_pay_cr_cur_id,
                                                       p_pay_cr_from_id =>  v_pay_cr_from_id, 
                                                       p_pay_cr_to_id   =>  v_p_pay_cr_to_id,
-                                                      p_pay_ct_data    =>  v_pay_ct_data);                                                       
+                                                      p_pay_ct_data_arr    =>  v_pay_ct_data);                                                       
    COMMIT;
    
    SELECT CREATE_DTIME_TECH, 
@@ -120,7 +120,7 @@ v_pay_ct_data        t_payment_detail_array := t_payment_detail_array(t_payment_
 
 BEGIN 
     payment_detail_api_pack.pr_insert_or_update_payment_detail(p_payment_id     =>  v_payment_id,
-                                                               p_pay_data_data  =>  v_pay_ct_data
+                                                               p_pay_data_arr  =>  v_pay_ct_data
                                                                );                                                                                           
    COMMIT;
    
@@ -183,17 +183,17 @@ v_p_pay_cr_to_id  integer := 999;
 v_pay_ct_data     t_payment_detail_array := null;
 
 BEGIN 
-    v_payment_id := payment_api_pack.f_create_payment(p_pay_cr_sum     =>  v_pay_cr_sum, 
-                                                      p_pay_cr_date    =>  v_pay_cr_date, 
-                                                      p_pay_cr_cur_id  =>  v_pay_cr_cur_id,
-                                                      p_pay_cr_from_id =>  v_pay_cr_from_id, 
-                                                      p_pay_cr_to_id   =>  v_p_pay_cr_to_id,
-                                                      p_pay_ct_data    =>  v_pay_ct_data);                                                       
+    v_payment_id := payment_api_pack.f_create_payment(p_pay_cr_sum       =>  v_pay_cr_sum, 
+                                                      p_pay_cr_date      =>  v_pay_cr_date, 
+                                                      p_pay_cr_cur_id    =>  v_pay_cr_cur_id,
+                                                      p_pay_cr_from_id   =>  v_pay_cr_from_id, 
+                                                      p_pay_cr_to_id     =>  v_p_pay_cr_to_id,
+                                                      p_pay_ct_data_arr  =>  v_pay_ct_data);                                                       
 
   raise_application_error(-20500, 'Unit-тест или API выполнены не верно!');
 
   EXCEPTION  
-      WHEN payment_api_pack.exp_empty_input_par  THEN
+      WHEN payment_common_pack.exp_empty_input_par  THEN
            dbms_output.put_line('В функции "Создание платежа". Ошибка: ' ||sqlerrm);   
 END;
 /
@@ -210,7 +210,7 @@ BEGIN
   raise_application_error(-20500, 'Unit-тест или API выполнены не верно!');
   
   EXCEPTION  
-      WHEN payment_api_pack.exp_empty_input_par  THEN
+      WHEN payment_common_pack.exp_empty_input_par  THEN
            dbms_output.put_line('В процедуре "Сброс платежа". Ошибка: ' ||sqlerrm);                      
                         
    
@@ -223,14 +223,14 @@ v_payment_id      PAYMENT.PAYMENT_ID%type := null;
 v_cancel_reason   PAYMENT.STATUS_CHANGE_REASON%type := null;
 
 BEGIN 
-    payment_api_pack.pr_cancel_payment(p_payment_id    =>  v_payment_id, 
+    payment_api_pack.pr_cancel_payment(p_payment_id     =>  v_payment_id, 
                                        p_cancel_reason  =>  v_cancel_reason
                                        );                                                                                                 
    
   raise_application_error(-20500, 'Unit-тест или API выполнены не верно!');
 
   EXCEPTION  
-      WHEN payment_api_pack.exp_empty_input_par  THEN
+      WHEN payment_common_pack.exp_empty_input_par  THEN
            dbms_output.put_line('В процедуре "Отмена платежа". Ошибка: ' ||sqlerrm);                      
                          
 end;
@@ -241,13 +241,13 @@ DECLARE
 v_payment_id      PAYMENT.PAYMENT_ID%type := null;
 
 BEGIN 
-    payment_api_pack.pr_successful_finish_payment(p_payment_id    =>  v_payment_id);                                                                                           
+    payment_api_pack.pr_successful_finish_payment(p_payment_id   =>  v_payment_id);                                                                                           
      
                         
   raise_application_error(-20500, 'Unit-тест или API выполнены не верно!');
 
   EXCEPTION  
-      WHEN payment_api_pack.exp_empty_input_par  THEN
+      WHEN payment_common_pack.exp_empty_input_par  THEN
            dbms_output.put_line('В процедуре "Завершение платежа". Ошибка: ' ||sqlerrm);                      
                                                  
 end;
@@ -259,14 +259,14 @@ v_payment_id      PAYMENT.PAYMENT_ID%type := null;
 v_pay_ct_data     t_payment_detail_array;
 
 BEGIN 
-    payment_detail_api_pack.pr_insert_or_update_payment_detail(p_payment_id     =>  v_payment_id,
-                                                               p_pay_data_data  =>  v_pay_ct_data
+    payment_detail_api_pack.pr_insert_or_update_payment_detail(p_payment_id    =>  v_payment_id,
+                                                               p_pay_data_arr  =>  v_pay_ct_data
                                                                );                                                                                               
   
   raise_application_error(-20500, 'Unit-тест или API выполнены не верно!');
 
   EXCEPTION  
-      WHEN payment_detail_api_pack.exp_empty_input_par  THEN
+      WHEN payment_common_pack.exp_empty_input_par  THEN
            dbms_output.put_line('В процедуре "Данные платежа". Ошибка: ' ||sqlerrm);  
      
 end;
@@ -285,7 +285,7 @@ BEGIN
     raise_application_error(-20500, 'Unit-тест или API выполнены не верно!');
 
     EXCEPTION  
-      WHEN payment_detail_api_pack.exp_empty_input_par  THEN
+      WHEN payment_common_pack.exp_empty_input_par  THEN
            dbms_output.put_line('В процедуре "Детали платежа". Ошибка: ' ||sqlerrm);  
           
 end;
@@ -301,7 +301,7 @@ BEGIN
     raise_application_error(-20500, 'Unit-тест или API выполнены не верно!');
 
   EXCEPTION  
-      WHEN payment_api_pack.exp_delete_obj  THEN
+      WHEN payment_common_pack.exp_delete_obj  THEN
            dbms_output.put_line('Удаление записи. Ошибка: ' ||sqlerrm); 
 END;
 /
@@ -334,7 +334,7 @@ BEGIN
     raise_application_error(-20500, 'Unit-тест или API выполнены не верно!');
 
   EXCEPTION  
-      WHEN payment_api_pack.exp_manual_changes  THEN
+      WHEN payment_common_pack.exp_manual_changes  THEN
            dbms_output.put_line('Удаление записи. Ошибка: ' ||sqlerrm); 
 END;
 /
@@ -351,7 +351,7 @@ BEGIN
     raise_application_error(-20500, 'Unit-тест или API выполнены не верно!');
 
   EXCEPTION  
-      WHEN payment_api_pack.exp_manual_changes  THEN
+      WHEN payment_common_pack.exp_manual_changes  THEN
            dbms_output.put_line('Обнорвление записи. Ошибка: ' ||sqlerrm); 
 END;
 /
@@ -366,7 +366,7 @@ BEGIN
     raise_application_error(-20500, 'Unit-тест или API выполнены не верно!');
 
   EXCEPTION  
-      WHEN payment_detail_api_pack.exp_delete_obj  THEN
+      WHEN payment_common_pack.exp_delete_obj  THEN
            dbms_output.put_line('Удаление записи. Ошибка: ' ||sqlerrm); 
 END;
 /
@@ -374,8 +374,6 @@ END;
 -- Проверка вставки данных не через API для таблицы payment_detail --
 DECLARE
 v_payment_id         payment_detail.PAYMENT_ID%type := 11;
-
-
 
 BEGIN 
     insert into payment_detail(PAYMENT_ID)
@@ -385,7 +383,7 @@ BEGIN
     raise_application_error(-20500, 'Unit-тест или API выполнены не верно!');
 
   EXCEPTION  
-      WHEN payment_detail_api_pack.exp_manual_changes  THEN
+      WHEN payment_common_pack.exp_manual_changes  THEN
            dbms_output.put_line('Удаление записи. Ошибка: ' ||sqlerrm); 
 END;
 /
@@ -402,7 +400,67 @@ BEGIN
     raise_application_error(-20500, 'Unit-тест или API выполнены не верно!');
 
   EXCEPTION  
-      WHEN payment_detail_api_pack.exp_manual_changes  THEN
+      WHEN payment_common_pack.exp_manual_changes  THEN
            dbms_output.put_line('Обнорвление записи. Ошибка: ' ||sqlerrm); 
+END;
+/
+
+-- Unit-тесты на отключение глобального запрета -- 
+-- 1.Прямой delete платежа --
+DECLARE
+v_payment_id       payment_detail.PAYMENT_ID%type := 11;
+
+BEGIN
+  payment_common_pack.pr_without_api_dml_enable();
+  
+  DELETE FROM payment 
+  WHERE payment_id = v_payment_id;
+  
+  payment_common_pack.pr_without_api_dml_disable();
+  
+EXCEPTION 
+  WHEN OTHERS THEN
+    payment_common_pack.pr_without_api_dml_disable();
+    RAISE;
+END;
+/
+
+-- 2.Прямой update платежа --
+DECLARE
+  v_payment_id       payment_detail.PAYMENT_ID%type := 11;
+
+BEGIN
+  payment_common_pack.pr_without_api_dml_enable();
+  
+  UPDATE payment 
+  SET PAYMENT_ID = 111 
+  WHERE payment_id = v_payment_id;
+  
+  payment_common_pack.pr_without_api_dml_disable();
+  
+EXCEPTION 
+  WHEN OTHERS THEN
+    payment_common_pack.pr_without_api_dml_disable();
+    RAISE;
+END;
+/
+
+-- 3.Прямой update деталей платежа --
+DECLARE
+  v_payment_id       payment_detail.PAYMENT_ID%type := 11;
+
+BEGIN
+  payment_common_pack.pr_without_api_dml_enable();
+  
+  UPDATE payment_detail 
+  SET PAYMENT_ID = 111 
+  WHERE payment_id = v_payment_id;
+  
+  payment_common_pack.pr_without_api_dml_disable();
+  
+EXCEPTION 
+  WHEN OTHERS THEN
+    payment_common_pack.pr_without_api_dml_disable();
+    RAISE;
 END;
 /

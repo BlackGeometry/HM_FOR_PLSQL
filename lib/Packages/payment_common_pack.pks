@@ -1,8 +1,14 @@
-Create or replace package payment_detail_api_pack  is 
+Create or replace package payment_common_pack  is 
 /*
 Автор: Kovalenko K.E.
-Описание скрипта: API для сущностей “Детали платежа” 
+Описание скрипта: Константы для сущностей - "Платеж", "Детали платежа". 
 */
+    -- Константы статусов активности клиена -- 
+    c_pay_cr_status   constant PAYMENT.STATUS%type := 0;
+    c_complet_status  constant PAYMENT.STATUS%type := 1;
+    c_reset_status    constant PAYMENT.STATUS%type := 2;
+    c_cancel_status   constant PAYMENT.STATUS%type := 3;    
+    
     -- Сообщения ошибок --   
     c_error_msg_empty_id       constant varchar2(250 char) := 'ID Поля не может быть пустым!';
     c_error_msg_empty_val      constant varchar2(250 char) := 'Значение в поле не может быть пустым!';
@@ -16,7 +22,7 @@ Create or replace package payment_detail_api_pack  is
     -- Коды ошибкок --
     c_error_code_empty_par   constant number(10) := -20099;    
     c_error_code_delete_obj  constant number(10) := -20098; 
-    c_error_code_dml_changes constant number(10) := -20097;
+    c_error_code_dml_changes constant number(10) := -20097;   
     
     -- Объекты исключений --
     exp_empty_input_par exception;
@@ -25,17 +31,15 @@ Create or replace package payment_detail_api_pack  is
     pragma exception_init(exp_delete_obj, c_error_code_delete_obj);
     exp_manual_changes exception;
     pragma exception_init(exp_manual_changes, c_error_code_dml_changes);
- 
-    -- Данные платежа --
-    procedure pr_insert_or_update_payment_detail(p_payment_id     PAYMENT.PAYMENT_ID%type,
-                                                 p_pay_data_arr   t_payment_detail_array);
-
-    -- Детали платежа --
-    procedure delete_payment_detail(p_payment_id     PAYMENT.PAYMENT_ID%type,
-                                    p_pay_info_data  t_number_array);
-                                    
-    -- Проверка DML через API --
-    procedure pr_dml_api_check;
-                                    
-end payment_detail_api_pack;
+    
+    -- Процедура вклюения DML в обход API --
+    procedure pr_without_api_dml_enable;
+    
+    -- Процедура отключения DML в обход API --
+    procedure pr_without_api_dml_disable;
+    
+    -- Функция получения текущего статуса режима работы изменения DML в API --
+    function f_dml_api_check return boolean;   
+       
+end payment_common_pack;
 /
