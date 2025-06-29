@@ -3,6 +3,7 @@ create or replace package payment_api_pack is
 Автор: Kovalenko K.E.
 Описание скрипта: API для сущностей “Платеж”
 */
+
     -- Создание платежа --
     function f_create_payment(p_pay_cr_sum       PAYMENT.SUMMA%type,
                               p_pay_cr_date      PAYMENT.CREATE_DTIME%type,
@@ -29,5 +30,9 @@ create or replace package payment_api_pack is
 
     -- Проверка DML не через API --
     procedure pr_without_api_dml_check;
-
+    
+    -- Блокировка по платежу -- 
+    procedure try_lock_payment(p_payment_id PAYMENT.PAYMENT_ID%type);
+     
 end payment_api_pack;
+/

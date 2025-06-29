@@ -75,6 +75,8 @@ create or replace package body payment_api_pack is
       raise_application_error(payment_common_pack.c_error_code_empty_par, payment_common_pack.c_error_msg_empty_obj_id);
    end if; 
    
+   try_lock_payment(p_payment_id);
+   
    api_chages_enable();
    
    update payment
@@ -107,6 +109,8 @@ create or replace package body payment_api_pack is
       raise_application_error(payment_common_pack.c_error_code_empty_par, payment_common_pack.c_error_msg_empty_obj_id);
    end if; 
    
+   try_lock_payment(p_payment_id);
+   
    api_chages_enable();
    
    update payment
@@ -134,6 +138,8 @@ create or replace package body payment_api_pack is
       raise_application_error(payment_common_pack.c_error_code_empty_par, payment_common_pack.c_error_msg_empty_obj_id);
    end if;
    
+   try_lock_payment(p_payment_id);
+  
    api_chages_enable();
    
    update payment
@@ -169,6 +175,27 @@ create or replace package body payment_api_pack is
       raise_application_error(payment_common_pack.c_error_code_dml_changes, payment_common_pack.c_error_msg_dml_changes);
     end if;
   end pr_without_api_dml_check;
-      
+  
+  -- Блокировка по платежу -- 
+  procedure try_lock_payment(p_payment_id PAYMENT.PAYMENT_ID%type)
+  as 
+    v_status_check      PAYMENT.STATUS%type;
+  begin
+    select t.STATUS 
+    into v_status_check 
+    from payment t 
+    where t.payment_id = p_payment_id
+    for update nowait;
+    
+    if v_status_check <> payment_common_pack.c_pay_cr_status then
+          raise_application_error(payment_common_pack.c_error_code_dml_inactive_object, payment_common_pack.c_error_msg_inactive_object);
+    end if;
+      exception
+          when no_data_found then
+             raise_application_error(payment_common_pack.c_error_code_object_notfound, payment_common_pack.c_error_msg_object_notfound);
+          when payment_common_pack.exp_row_locked then
+             raise_application_error(payment_common_pack.c_error_code_object_already_locked, payment_common_pack.c_error_msg_object_already_locked);            
+  end try_lock_payment;
+  
 end payment_api_pack;     
 /

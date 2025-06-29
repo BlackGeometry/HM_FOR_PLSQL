@@ -464,3 +464,15 @@ EXCEPTION
     RAISE;
 END;
 /
+-- Негативный unit-тест для ситуации отсутствия в таблице payment переданного ID платежа. --
+declare
+  v_payment_id     payment_detail.PAYMENT_ID%type := 11;
+begin
+  payment_api_pack.pr_fail_payment(v_payment_id, 
+                                   'Тест');
+  raise_application_error(-20999, 'Unit-тесты или API выполнены неверно!');
+exception
+   when payment_common_pack.exp_object_notfound then
+        dbms_output.put_line('"Объект не найден". Ошибка: ' || sqlerrm);
+end;
+/
